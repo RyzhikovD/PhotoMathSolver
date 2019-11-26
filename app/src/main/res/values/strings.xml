@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">PhotoMathSolver</string>
+    <string name="photo">Photo</string>
+    <string name="crop">Crop Image</string>
+    <string name="solve">Solve</string>
+    <string name="scan_photo">Scan Photo</string>
+    <string name="image_of_formula">Image Of Formula</string>
+    <string name="update_image">Update Image</string>
+</resources>
