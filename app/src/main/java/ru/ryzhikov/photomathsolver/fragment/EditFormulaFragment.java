@@ -22,6 +22,7 @@ import ru.ryzhikov.photomathsolver.provider.LearningProgramProvider;
 public class EditFormulaFragment extends Fragment implements View.OnClickListener {
 
     private final String mScannedFormula;
+    private final String mWolfram;
     private EditText mFormula;
     private ImageView mImageView;
     private final LearningProgramProvider mLearningProgramProvider = new LearningProgramProvider();
@@ -30,12 +31,13 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         setRetainInstance(true);
     }
 
-    static EditFormulaFragment newInstance(String formula) {
-        return new EditFormulaFragment(formula);
+    static EditFormulaFragment newInstance(String formula, String wolfram) {
+        return new EditFormulaFragment(formula, wolfram);
     }
 
-    private EditFormulaFragment(String formula) {
+    private EditFormulaFragment(String formula, String wolfram) {
         mScannedFormula = formula;
+        mWolfram = wolfram;
     }
 
     @Nullable
@@ -56,7 +58,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFormula.setText(mScannedFormula);
+        mFormula.setText(mWolfram);
         loadImage(URLConverter.getUrlForFormula(mScannedFormula));
     }
 
@@ -70,7 +72,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
                         .commit();
                 break;
             case R.id.button_update_image:
-                loadImage(URLConverter.getUrlForFormula(mFormula.getText().toString()));
+                loadImage(URLConverter.getLatexFromWolfram(mFormula.getText().toString()));
                 break;
         }
     }
@@ -83,23 +85,6 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     private void updateImage() {
         mImageView.setImageBitmap(mLearningProgramProvider.provideImage());
     }
-
-//    private void initEditText() {
-//        mFormula.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//            }
-//        });
-//    }
 
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 

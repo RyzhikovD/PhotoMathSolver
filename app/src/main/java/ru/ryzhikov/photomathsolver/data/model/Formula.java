@@ -5,12 +5,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class Formula {
 
-    @SerializedName("latex_simplified")
+    @SerializedName("latex_normal")
     @Expose
     private String mLatex;
 
-//    @SerializedName("detection_map")
-//    @Expose
     private DetectionMap mDetectionMap;
 
 //    @SerializedName("error")
@@ -29,8 +27,6 @@ public class Formula {
     @Expose
     private double mLatexConfidenceRate;
 
-//    @SerializedName("position")
-//    @Expose
     private Position mPosition;
 
     @SerializedName("wolfram")
@@ -45,10 +41,6 @@ public class Formula {
         @SerializedName("contains_diagram")
         @Expose
         public double contains_diagram;
-
-//        @SerializedName("contains_geometry")
-//        @Expose
-//        public double contains_geometry;
 
         @SerializedName("contains_graph")
         @Expose

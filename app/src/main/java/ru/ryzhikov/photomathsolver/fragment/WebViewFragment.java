@@ -25,7 +25,7 @@ public class WebViewFragment extends Fragment {
     }
 
     private WebViewFragment(String editedFormula) {
-        mURL = WOLFRAM_INPUT_URL + getUrlForFormula(editedFormula);
+        mURL = WOLFRAM_INPUT_URL + editedFormula;
     }
 
     @Nullable
@@ -49,27 +49,4 @@ public class WebViewFragment extends Fragment {
         mWebView.loadUrl(mURL);
 
     }
-
-    private String getUrlForFormula(String editedFormula) {
-        String url = editedFormula
-                .replace(" ", "")
-                .replace("\\", " \\")
-                .replace("+", "%2B").trim();
-
-        int indexOfLim = url.indexOf("lim");
-        if (indexOfLim != -1) {
-            if (url.charAt(indexOfLim + 3) == '_') {
-                url = url.concat(" as " + url.charAt(indexOfLim + 5) + "->" + url.substring(indexOfLim + 19, url.indexOf("}", indexOfLim)));
-                System.out.println(url);
-                url = url.substring(0, indexOfLim + 3).concat(url.substring(url.indexOf("}", indexOfLim) + 1));
-                System.out.println("url = " + url);
-            }
-            url = url.replace("\\lim", "lim");
-        }
-        return url;
-    }
-
-//    private String performLimits() {
-//        return null;
-//    }
 }

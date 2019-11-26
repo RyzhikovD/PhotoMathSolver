@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,11 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.URL;
 
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
@@ -90,7 +86,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        System.out.println("_________________CLICK__________________");
         switch (v.getId()) {
             case R.id.button_crop:
                 performCrop(mImageUri);
@@ -117,12 +112,12 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                     int photoH = bmOptions.outHeight;
 
                     // Determine how much to scale down the image
-                    int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+                    int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
                     // Decode the image file into a Bitmap sized to fill the View
                     bmOptions.inJustDecodeBounds = false;
                     bmOptions.inSampleSize = scaleFactor;
-                    bmOptions.inPurgeable = true;
+//                    bmOptions.inPurgeable = true;
 
                     Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
 
@@ -182,9 +177,10 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
             System.out.println("receivedFormula = null");
         }
         String formulaString = formula == null ? test : formula.getLatex();
+        String wolfram = formula == null ? test : formula.getWolfram();
 
         requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.root, EditFormulaFragment.newInstance(formulaString))
+                .replace(R.id.root, EditFormulaFragment.newInstance(formulaString, wolfram))
                 .commit();
     }
 
@@ -232,12 +228,12 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 int photoH = bmOptions.outHeight;
 
                 // Determine how much to scale down the image
-                int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+                int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
                 // Decode the image file into a Bitmap sized to fill the View
                 bmOptions.inJustDecodeBounds = false;
                 bmOptions.inSampleSize = scaleFactor;
-                bmOptions.inPurgeable = true;
+//                bmOptions.inPurgeable = true;
 
                 Bitmap bitmap = BitmapFactory.decodeFile(mFragmentReference.get().mPath, bmOptions);
 

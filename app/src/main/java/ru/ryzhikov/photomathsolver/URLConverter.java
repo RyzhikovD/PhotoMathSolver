@@ -8,4 +8,11 @@ public class URLConverter {
                 .replace("\\", " \\")
                 .replace("+", "%2B").trim();
     }
+
+    public static String getLatexFromWolfram(String wolframFormula) {
+        return wolframFormula
+                .replace("(", "{")
+                .replace(")", "}")
+                .replace("to", "\\rightarrow");
+    }
 }
