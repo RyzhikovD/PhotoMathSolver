@@ -1,11 +1,14 @@
 package ru.ryzhikov.photomathsolver;
 
+/**
+ *  Используется для преобразования строки в параметр url
+ */
 public class URLConverter {
 
     public static String getUrlForFormula(String editedFormula) {
         return editedFormula
                 .replace(" ", "")
-                .replace("\\", " \\")
+//                .replace("\\", " \\")
                 .replace("+", "%2B").trim();
     }
 

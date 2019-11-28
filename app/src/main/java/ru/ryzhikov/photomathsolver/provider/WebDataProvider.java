@@ -19,6 +19,12 @@ public class WebDataProvider {
 
     private ImageRepository mImageRepository = new ImageRepository();
 
+    /**
+     * Загружает картинку для latex формулы
+     *
+     * @param formula - latex формула
+     * @return
+     */
     @Nullable
     public static Bitmap loadImage(String formula) {
         Bitmap image = null;

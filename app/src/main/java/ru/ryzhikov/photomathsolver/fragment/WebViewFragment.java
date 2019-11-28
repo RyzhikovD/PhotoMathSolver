@@ -45,7 +45,6 @@ public class WebViewFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        System.out.println("mURL = " + mURL);
         mWebView.loadUrl(mURL);
 
     }

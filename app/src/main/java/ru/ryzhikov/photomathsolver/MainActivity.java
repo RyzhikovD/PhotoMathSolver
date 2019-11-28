@@ -78,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("requestCode = " + requestCode);
-        System.out.println("resultCode = " + resultCode);
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))

@@ -33,8 +33,8 @@ public class ImageRepository {
                     public Response intercept(@NonNull Interceptor.Chain chain) throws IOException {
                         Request request = chain.request().newBuilder()
                                 .addHeader("content-type", "application/json")
-                                .addHeader("app_id", "ryzhikov_dmvl_gmail_com")
-                                .addHeader("app_key", "28d1ed4c4d6458420a3f")
+                                .addHeader("app_id", "")    //мой id для Mathpix
+                                .addHeader("app_key", "")   //мой ключ
                                 .build();
                         return chain.proceed(request);
                     }

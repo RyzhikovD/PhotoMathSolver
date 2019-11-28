@@ -66,7 +66,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         switch (v.getId()) {
             case R.id.button_solve:
                 requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, WebViewFragment.newInstance(mEditFormula.getText().toString()))
+                        .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForFormula(mEditFormula.getText().toString())))
                         .addToBackStack(WebViewFragment.class.getSimpleName())
                         .commit();
                 break;

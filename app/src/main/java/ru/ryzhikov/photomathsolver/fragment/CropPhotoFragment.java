@@ -76,11 +76,8 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         if (requestCode == PIC_CROP) {
             if (data != null) {
                 Uri dataUri = data.getData();
-                System.out.println("dataUri = " + dataUri);
                 mImageView.setImageURI(null);
                 mImageView.setImageURI(dataUri);
-            } else {
-                System.out.println("data is null");
             }
         }
     }
@@ -116,7 +113,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     private void performCrop(Uri picUri) {
         try {
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            System.out.println(mImageUri.getPath());
             cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 
             cropIntent.setDataAndType(picUri, "image/*");
@@ -141,11 +137,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     private void scan(Formula formula) {
         String test = "\\int _ { 0 } ^ { a } \\frac { 1 } { 2 x ^ { 2 } + 123 } d x";
 
-        if (formula != null) {
-            System.out.println("receivedFormula = " + formula.getLatex());
-        } else {
-            System.out.println("receivedFormula = null");
-        }
         String latexFormula = formula == null ? test : formula.getLatex();
         String wolframFormula = formula == null ? test : formula.getWolfram();
 

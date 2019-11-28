@@ -3,6 +3,9 @@ package ru.ryzhikov.photomathsolver.data.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Полученный от Mathpix json
+ */
 public class Formula {
 
     @SerializedName("latex_normal")
