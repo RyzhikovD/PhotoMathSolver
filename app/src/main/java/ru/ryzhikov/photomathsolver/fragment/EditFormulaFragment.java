@@ -17,27 +17,26 @@ import java.lang.ref.WeakReference;
 
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.URLConverter;
-import ru.ryzhikov.photomathsolver.provider.LearningProgramProvider;
+import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
 
 public class EditFormulaFragment extends Fragment implements View.OnClickListener {
 
-    private final String mScannedFormula;
-    private final String mWolfram;
-    private EditText mFormula;
+    private final String mLatexFormula;
+    private final String mWolframFormula;
+    private EditText mEditFormula;
     private ImageView mImageView;
-    private final LearningProgramProvider mLearningProgramProvider = new LearningProgramProvider();
 
     {
         setRetainInstance(true);
     }
 
-    static EditFormulaFragment newInstance(String formula, String wolfram) {
-        return new EditFormulaFragment(formula, wolfram);
+    static EditFormulaFragment newInstance(String latexFormula, String wolframFormula) {
+        return new EditFormulaFragment(latexFormula, wolframFormula);
     }
 
-    private EditFormulaFragment(String formula, String wolfram) {
-        mScannedFormula = formula;
-        mWolfram = wolfram;
+    private EditFormulaFragment(String latexFormula, String wolframFormula) {
+        mLatexFormula = latexFormula;
+        mWolframFormula = wolframFormula;
     }
 
     @Nullable
@@ -49,7 +48,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mFormula = view.findViewById(R.id.edit_text_formula);
+        mEditFormula = view.findViewById(R.id.edit_text_formula);
         mImageView = view.findViewById(R.id.image_of_formula);
         view.findViewById(R.id.button_solve).setOnClickListener(this);
         view.findViewById(R.id.button_update_image).setOnClickListener(this);
@@ -58,8 +57,8 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFormula.setText(mWolfram);
-        loadImage(URLConverter.getUrlForFormula(mScannedFormula));
+        mEditFormula.setText(mWolframFormula);
+        loadImage(URLConverter.getUrlForFormula(mLatexFormula));
     }
 
     @Override
@@ -67,12 +66,12 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         switch (v.getId()) {
             case R.id.button_solve:
                 requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, WebViewFragment.newInstance(mFormula.getText().toString()))
+                        .replace(R.id.root, WebViewFragment.newInstance(mEditFormula.getText().toString()))
                         .addToBackStack(WebViewFragment.class.getSimpleName())
                         .commit();
                 break;
             case R.id.button_update_image:
-                loadImage(URLConverter.getLatexFromWolfram(mFormula.getText().toString()));
+                loadImage(URLConverter.getLatexFromWolfram(mEditFormula.getText().toString()));
                 break;
         }
     }
@@ -82,24 +81,20 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         downloadImageTask.execute(formula);
     }
 
-    private void updateImage() {
-        mImageView.setImageBitmap(mLearningProgramProvider.provideImage());
+    private void updateImage(Bitmap image) {
+        mImageView.setImageBitmap(image);
     }
 
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
         private final WeakReference<EditFormulaFragment> mFragmentReference;
 
-        private final LearningProgramProvider mProvider;
-
-
         private DownloadImageTask(@NonNull EditFormulaFragment fragment) {
             mFragmentReference = new WeakReference<>(fragment);
-            mProvider = fragment.mLearningProgramProvider;
         }
 
         protected Bitmap doInBackground(String... formulas) {
-            return mProvider.loadImage(formulas[0]);
+            return WebDataProvider.loadImage(formulas[0]);
         }
 
         protected void onPostExecute(Bitmap result) {
@@ -107,7 +102,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
             if (fragment == null) {
                 return;
             }
-            fragment.updateImage();
+            fragment.updateImage(result);
         }
 
     }

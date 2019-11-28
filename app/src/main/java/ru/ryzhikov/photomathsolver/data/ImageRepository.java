@@ -30,7 +30,7 @@ public class ImageRepository {
                 .addInterceptor(interceptor)
                 .addInterceptor(new Interceptor() {
                     @Override
-                    public Response intercept(Interceptor.Chain chain) throws IOException {
+                    public Response intercept(@NonNull Interceptor.Chain chain) throws IOException {
                         Request request = chain.request().newBuilder()
                                 .addHeader("content-type", "application/json")
                                 .addHeader("app_id", "ryzhikov_dmvl_gmail_com")
@@ -49,12 +49,12 @@ public class ImageRepository {
     }
 
     @NonNull
-    public Formula loadCurrencies(String src) throws IOException {
+    public Formula loadFormula(String src) throws IOException {
         RequestBody requestBody = new RequestBody("data:image/jpeg;base64," + src, FORMATS);
         Call<Formula> listCall = mPhotoScanService.scanImage(requestBody);
         retrofit2.Response<Formula> response = listCall.execute();
         if (response.body() == null || response.errorBody() != null) {
-            throw new IOException("Не удалось загрузить фото");
+            throw new IOException("Не удалось отсканировать фото");
         }
         return response.body();
     }

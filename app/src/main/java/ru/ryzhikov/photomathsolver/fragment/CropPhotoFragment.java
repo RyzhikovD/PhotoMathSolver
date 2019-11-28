@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
-import ru.ryzhikov.photomathsolver.provider.LearningProgramProvider;
+import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
 
 public class CropPhotoFragment extends Fragment implements View.OnClickListener {
 
@@ -34,10 +34,11 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     private ImageView mImageView;
     private Uri mImageUri;
 
-    private final LearningProgramProvider mLearningProgramProvider = new LearningProgramProvider();
     private int targetW;
     private int targetH;
     private String mPath;
+
+    private final WebDataProvider mWebDataProvider = new WebDataProvider();
 
     public static Fragment newInstance(Uri imageUri, String path) {
         return new CropPhotoFragment(imageUri, path);
@@ -91,41 +92,23 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 performCrop(mImageUri);
                 break;
             case R.id.button_scan:
-                try {
-//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), mImageUri);
+                targetW = mImageView.getWidth();
+                targetH = mImageView.getHeight();
 
-//                    String fname=new File(mImageUri.getEncodedPath()).getAbsolutePath();
-//                    Bitmap bitmap = BitmapFactory.decodeFile(fname);
+                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                bmOptions.inJustDecodeBounds = true;
 
-//                    InputStream imageStream = requireActivity().getContentResolver().openInputStream(mImageUri);
-//                    Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+                int photoW = bmOptions.outWidth;
+                int photoH = bmOptions.outHeight;
 
-                    // Get the dimensions of the View
-                    targetW = mImageView.getWidth();
-                    targetH = mImageView.getHeight();
+                int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
-                    // Get the dimensions of the bitmap
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    bmOptions.inJustDecodeBounds = true;
+                bmOptions.inJustDecodeBounds = false;
+                bmOptions.inSampleSize = scaleFactor;
 
-                    int photoW = bmOptions.outWidth;
-                    int photoH = bmOptions.outHeight;
+                Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
 
-                    // Determine how much to scale down the image
-                    int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-                    // Decode the image file into a Bitmap sized to fill the View
-                    bmOptions.inJustDecodeBounds = false;
-                    bmOptions.inSampleSize = scaleFactor;
-//                    bmOptions.inPurgeable = true;
-
-                    Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
-
-                    loadImage(bitmapToBase64(bitmap));
-//                } catch (IOException e) {
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                loadImage(bitmap);
                 break;
         }
     }
@@ -136,57 +119,44 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
             System.out.println(mImageUri.getPath());
             cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 
-            // indicate image type and Uri
             cropIntent.setDataAndType(picUri, "image/*");
-            // set crop properties here
             cropIntent.putExtra("crop", true);
-            // indicate aspect of desired crop
             cropIntent.putExtra("aspectX", 1);
             cropIntent.putExtra("aspectY", 1);
-            // indicate output X and Y
             cropIntent.putExtra("outputX", targetW);
             cropIntent.putExtra("outputY", targetH);
-            // retrieve data on return
             cropIntent.putExtra("return-data", true);
-            // start the activity - we handle returning in onActivityResult
-
 
             cropIntent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.name());
             cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-//            setResult(RESULT_OK, cropIntent);
             startActivityForResult(cropIntent, PIC_CROP);
-        }
-        // respond to users whose devices do not support the crop action
-        catch (ActivityNotFoundException ex) {
-            // display an error message
-            String errorMessage = "Whoops - your device doesn't support the crop action!";
+        } catch (ActivityNotFoundException ex) {
+            String errorMessage = "Your device doesn't support the crop action!";
             Toast toast = Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT);
             toast.show();
         }
     }
 
-    private void scan() {
+    private void scan(Formula formula) {
         String test = "\\int _ { 0 } ^ { a } \\frac { 1 } { 2 x ^ { 2 } + 123 } d x";
-
-        Formula formula = mLearningProgramProvider.provideFormula();
 
         if (formula != null) {
             System.out.println("receivedFormula = " + formula.getLatex());
         } else {
             System.out.println("receivedFormula = null");
         }
-        String formulaString = formula == null ? test : formula.getLatex();
-        String wolfram = formula == null ? test : formula.getWolfram();
+        String latexFormula = formula == null ? test : formula.getLatex();
+        String wolframFormula = formula == null ? test : formula.getWolfram();
 
         requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.root, EditFormulaFragment.newInstance(formulaString, wolfram))
+                .replace(R.id.root, EditFormulaFragment.newInstance(latexFormula, wolframFormula))
                 .commit();
     }
 
-    private void loadImage(String formula) {
+    private void loadImage(Bitmap bitmap) {
         DownloadFormulaTask downloadFormulaTask = new DownloadFormulaTask(this);
-        downloadFormulaTask.execute(formula);
+        downloadFormulaTask.execute(bitmap);
     }
 
     private static String bitmapToBase64(Bitmap image) {
@@ -195,49 +165,21 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
     }
 
-    private static class DownloadFormulaTask extends AsyncTask<String, Void, Formula> {
+    private static class DownloadFormulaTask extends AsyncTask<Bitmap, Void, Formula> {
 
         private final WeakReference<CropPhotoFragment> mFragmentReference;
 
-        private final LearningProgramProvider mProvider;
+        private final WebDataProvider mProvider;
 
 
         private DownloadFormulaTask(@NonNull CropPhotoFragment fragment) {
             mFragmentReference = new WeakReference<>(fragment);
-            mProvider = fragment.mLearningProgramProvider;
+            mProvider = fragment.mWebDataProvider;
         }
 
-        protected Formula doInBackground(String... formulas) {
+        protected Formula doInBackground(Bitmap... bitmaps) {
             try {
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(mFragmentReference.get().requireActivity().getContentResolver(), mFragmentReference.get().mImageUri);
-
-//                String fname=new File(mFragmentReference.get().mImageUri.getEncodedPath()).getAbsolutePath();
-//                Bitmap bitmap = BitmapFactory.decodeFile(fname);
-
-//                InputStream imageStream = mFragmentReference.get().requireActivity().getContentResolver().openInputStream(mFragmentReference.get().mImageUri);
-//                Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-
-                int targetW = mFragmentReference.get().targetW;
-                int targetH = mFragmentReference.get().targetH;
-
-                // Get the dimensions of the bitmap
-                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                bmOptions.inJustDecodeBounds = true;
-
-                int photoW = bmOptions.outWidth;
-                int photoH = bmOptions.outHeight;
-
-                // Determine how much to scale down the image
-                int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-                // Decode the image file into a Bitmap sized to fill the View
-                bmOptions.inJustDecodeBounds = false;
-                bmOptions.inSampleSize = scaleFactor;
-//                bmOptions.inPurgeable = true;
-
-                Bitmap bitmap = BitmapFactory.decodeFile(mFragmentReference.get().mPath, bmOptions);
-
-                return mProvider.loadFormula(bitmap);
+                return mProvider.loadFormula(bitmapToBase64(bitmaps[0]));
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -249,7 +191,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
             if (fragment == null) {
                 return;
             }
-            fragment.scan();
+            fragment.scan(formula);
         }
 
     }
