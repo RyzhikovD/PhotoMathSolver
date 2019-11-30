@@ -6,4 +6,6 @@
     <string name="scan_photo">Scan Photo</string>
     <string name="image_of_formula">Image Of Formula</string>
     <string name="update_image">Update Image</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
 </resources>
