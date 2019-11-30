@@ -5,17 +5,23 @@ package ru.ryzhikov.photomathsolver;
  */
 public class URLConverter {
 
-    public static String getUrlForFormula(String editedFormula) {
-        return editedFormula
+    public static String getUrlForLatexFormula(String latexFormula) {
+        return latexFormula
                 .replace(" ", "")
-//                .replace("\\", " \\")
+                .replace("\\", " \\")
                 .replace("+", "%2B").trim();
+    }
+
+    public static String getUrlForWolframFormula(String wolframFormula) {
+        return wolframFormula
+                .replace("+", "%2B");
     }
 
     public static String getLatexFromWolfram(String wolframFormula) {
         return wolframFormula
                 .replace("(", "{")
                 .replace(")", "}")
-                .replace("to", "\\rightarrow");
+                .replace("to", "\\rightarrow")
+                .replace("+", "%2B");
     }
 }

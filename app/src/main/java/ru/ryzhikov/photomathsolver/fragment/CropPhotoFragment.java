@@ -102,6 +102,8 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
                 bmOptions.inJustDecodeBounds = false;
                 bmOptions.inSampleSize = scaleFactor;
+                bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+                bmOptions.inSampleSize = 4;
 
                 Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
 

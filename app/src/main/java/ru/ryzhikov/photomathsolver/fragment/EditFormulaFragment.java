@@ -58,7 +58,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mEditFormula.setText(mWolframFormula);
-        loadImage(URLConverter.getUrlForFormula(mLatexFormula));
+        loadImage(URLConverter.getUrlForLatexFormula(mLatexFormula));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         switch (v.getId()) {
             case R.id.button_solve:
                 requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForFormula(mEditFormula.getText().toString())))
+                        .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForWolframFormula(mEditFormula.getText().toString())))
                         .addToBackStack(WebViewFragment.class.getSimpleName())
                         .commit();
                 break;
