@@ -1,34 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/image_photo"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9"
-        android:contentDescription="@string/photo" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/button_crop"
+        <ImageView
+            android:id="@+id/image_photo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:contentDescription="@string/photo" />
+
+        <Button
+            android:id="@+id/button_crop"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_marginRight="@dimen/default_margin"
+            android:layout_weight="1"
+            android:text="@string/crop" />
+
+        <Button
+            android:id="@+id/button_scan"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/default_margin"
+            android:layout_weight="1"
+            android:text="@string/scan_photo" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative_layout_progress"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginLeft="@dimen/default_margin"
-        android:layout_marginTop="@dimen/default_margin"
-        android:layout_marginRight="@dimen/default_margin"
-        android:layout_weight="1"
-        android:text="@string/crop" />
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible">
 
-    <Button
-        android:id="@+id/button_scan"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/default_margin"
-        android:layout_weight="1"
-        android:text="@string/scan_photo" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/progress_bar"
+            android:layout_centerHorizontal="true"
+            android:padding="@dimen/default_padding"
+            android:text="@string/loading_process"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+    </RelativeLayout>
+
+
+</FrameLayout>

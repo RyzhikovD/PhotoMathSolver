@@ -8,4 +8,5 @@
     <string name="update_image">Update Image</string>
     <string name="take_a_photo">Take a photo</string>
     <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="loading_process">Image processing. Please, wait…</string>
 </resources>

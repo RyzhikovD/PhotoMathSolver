@@ -20,11 +20,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import ru.ryzhikov.photomathsolver.BuildConfig;
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
+import ru.ryzhikov.photomathsolver.provider.FileProvider;
 import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
 
 public class CropPhotoFragment extends Fragment implements View.OnClickListener {
@@ -32,10 +35,11 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     private static final int PIC_CROP = 0;
 
     private ImageView mImageView;
-    private Uri mImageUri;
+    private View mProgressRelativeLayout;
 
     private int targetW;
     private int targetH;
+    private Uri mImageUri;
     private String mPath;
 
     private final WebDataProvider mWebDataProvider = new WebDataProvider();
@@ -59,6 +63,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mImageView = view.findViewById(R.id.image_photo);
+        mProgressRelativeLayout = view.findViewById(R.id.relative_layout_progress);
         view.findViewById(R.id.button_crop).setOnClickListener(this);
         view.findViewById(R.id.button_scan).setOnClickListener(this);
     }
@@ -75,7 +80,9 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
         if (requestCode == PIC_CROP) {
             if (data != null) {
+                System.out.println("data = " + data);
                 Uri dataUri = data.getData();
+                System.out.println("dataUri = " + dataUri);
                 mImageView.setImageURI(null);
                 mImageView.setImageURI(dataUri);
             }
@@ -86,9 +93,11 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_crop:
-                performCrop(mImageUri);
+                performCrop();
                 break;
             case R.id.button_scan:
+                mProgressRelativeLayout.setVisibility(View.VISIBLE);
+
                 targetW = mImageView.getWidth();
                 targetH = mImageView.getHeight();
 
@@ -112,12 +121,16 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    private void performCrop(Uri picUri) {
+    private void performCrop() {
         try {
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
 
-            cropIntent.setDataAndType(picUri, "image/*");
+            Uri uri = FileProvider.getUriForFile(requireContext(),
+                    BuildConfig.APPLICATION_ID + ".provider",
+                    new File(mPath));
+
+            cropIntent.setDataAndType(uri, "image/*");
+            cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
             cropIntent.putExtra("crop", true);
             cropIntent.putExtra("aspectX", 1);
             cropIntent.putExtra("aspectY", 1);
@@ -141,6 +154,8 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
         String latexFormula = formula == null ? test : formula.getLatex();
         String wolframFormula = formula == null ? test : formula.getWolfram();
+
+        mProgressRelativeLayout.setVisibility(View.GONE);
 
         requireActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.root, EditFormulaFragment.newInstance(latexFormula, wolframFormula))
