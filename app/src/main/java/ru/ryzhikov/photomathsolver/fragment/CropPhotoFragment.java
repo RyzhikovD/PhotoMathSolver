@@ -1,5 +1,6 @@
 package ru.ryzhikov.photomathsolver.fragment;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -87,13 +90,28 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 mImageView.setImageURI(dataUri);
             }
         }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (result != null) {
+                if (resultCode == Activity.RESULT_OK) {
+                    mImageUri = result.getUri();
+                    mImageView.setImageURI(null);
+                    mImageView.setImageURI(mImageUri);
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Exception error = result.getError();
+                    error.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_crop:
-                performCrop();
+//                performCrop();
+                CropImage.activity(mImageUri).start(requireActivity(), this);
                 break;
             case R.id.button_scan:
                 mProgressRelativeLayout.setVisibility(View.VISIBLE);
