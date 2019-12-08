@@ -1,5 +1,6 @@
 package ru.ryzhikov.photomathsolver.provider;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import ru.ryzhikov.photomathsolver.data.ImageRepository;
+import ru.ryzhikov.photomathsolver.data.FormulasRepository;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
 
 public class WebDataProvider {
@@ -17,7 +18,11 @@ public class WebDataProvider {
     private static final String IMAGE_ROOT_URL = "https://chart.googleapis.com/chart?cht=tx&chl=";
     private static final String SIZE_OF_IMAGE_URL_ARGUMENT = "&chs=200";
 
-    private ImageRepository mImageRepository = new ImageRepository();
+    private FormulasRepository mFormulasRepository;
+
+    public WebDataProvider(Context context) {
+        mFormulasRepository = new FormulasRepository(context);
+    }
 
     /**
      * Загружает картинку для latex формулы
@@ -48,7 +53,7 @@ public class WebDataProvider {
         return image;
     }
 
-    public Formula loadFormula(String base64Photo) throws IOException {
-        return mImageRepository.loadFormula(base64Photo);
+    public Formula loadFormula(String path, String base64Photo) throws IOException {
+        return mFormulasRepository.loadFormula(path, base64Photo);
     }
 }
