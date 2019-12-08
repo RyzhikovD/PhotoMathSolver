@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment;
 import java.lang.ref.WeakReference;
 
 import ru.ryzhikov.photomathsolver.R;
-import ru.ryzhikov.photomathsolver.URLConverter;
 import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
+import ru.ryzhikov.photomathsolver.utils.URLConverter;
 
 public class EditFormulaFragment extends Fragment implements View.OnClickListener {
 

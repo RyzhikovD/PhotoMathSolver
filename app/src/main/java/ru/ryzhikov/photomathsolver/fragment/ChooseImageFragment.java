@@ -82,7 +82,8 @@ public class ChooseImageFragment extends Fragment implements View.OnClickListene
                 }
             }
 
-            requireActivity().getSupportFragmentManager().beginTransaction()
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
                     .replace(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))
                     .addToBackStack(CropPhotoFragment.class.getSimpleName())
                     .commit();

@@ -88,6 +88,11 @@ public class Formula {
         public double top_left_y;
     }
 
+    public Formula(String latex, String wolfram) {
+        mLatex = latex;
+        mWolfram = wolfram;
+    }
+
     public String getLatex() {
         return mLatex;
     }

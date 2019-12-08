@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver;
+package ru.ryzhikov.photomathsolver.utils;
 
 /**
  *  Используется для преобразования строки в параметр url

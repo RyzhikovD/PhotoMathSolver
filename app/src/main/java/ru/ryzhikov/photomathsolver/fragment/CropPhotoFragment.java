@@ -1,5 +1,6 @@
 package ru.ryzhikov.photomathsolver.fragment;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,7 +46,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     private Uri mImageUri;
     private String mPath;
 
-    private final WebDataProvider mWebDataProvider = new WebDataProvider();
+    private WebDataProvider mWebDataProvider;
 
     public static Fragment newInstance(Uri imageUri, String path) {
         return new CropPhotoFragment(imageUri, path);
@@ -81,6 +84,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mImageView.setImageURI(mImageUri);
+        mWebDataProvider = new WebDataProvider(requireContext());
     }
 
     @Override
@@ -96,13 +100,28 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 mImageView.setImageURI(dataUri);
             }
         }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (result != null) {
+                if (resultCode == Activity.RESULT_OK) {
+                    mImageUri = result.getUri();
+                    mImageView.setImageURI(null);
+                    mImageView.setImageURI(mImageUri);
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Exception error = result.getError();
+                    error.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_crop:
-                performCrop();
+//                performCrop();
+                CropImage.activity(mImageUri).start(requireActivity(), this);
                 break;
             case R.id.button_scan:
                 mProgressRelativeLayout.setVisibility(View.VISIBLE);
@@ -182,21 +201,22 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
     }
 
-    private static class DownloadFormulaTask extends AsyncTask<Bitmap, Void, Formula> {
+    private static class DownloadFormulaTask extends AsyncTask<Bitmap, String, Formula> {
 
         private final WeakReference<CropPhotoFragment> mFragmentReference;
-
         private final WebDataProvider mProvider;
+        private final String mPath;
 
 
         private DownloadFormulaTask(@NonNull CropPhotoFragment fragment) {
             mFragmentReference = new WeakReference<>(fragment);
             mProvider = fragment.mWebDataProvider;
+            mPath = fragment.mPath;
         }
 
         protected Formula doInBackground(Bitmap... bitmaps) {
             try {
-                return mProvider.loadFormula(bitmapToBase64(bitmaps[0]));
+                return mProvider.loadFormula(mPath, bitmapToBase64(bitmaps[0]));
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
