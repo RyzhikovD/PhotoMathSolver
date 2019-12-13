@@ -63,7 +63,6 @@ public class FormulasRepository {
         mContext = context;
         RoomDatabase.Builder<FormulasDatabase> builder = Room.databaseBuilder(context, FormulasDatabase.class, "formulas");
         mDatabase = builder.build();
-//        mLiveData = mDatabase.getFormulasDao().getAllFormulas();
     }
 
     @NonNull
@@ -74,18 +73,19 @@ public class FormulasRepository {
             return new Formula(formulaDB.getLatexFormula(), formulaDB.getWolframFormula());
         } else {
             final Formula formula = loadFormulaViaRetrofit(src);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final FormulaDB newFormula = new FormulaDB();
-                    newFormula.setLatexFormula(formula.getLatex());
-                    newFormula.setWolframFormula(formula.getWolfram());
-                    newFormula.setPath(path);
-                    mDatabase.getFormulasDao().addFormula(newFormula);
-                }
+            new Thread(() -> {
+                final FormulaDB newFormula = new FormulaDB();
+                newFormula.setLatexFormula(formula.getLatex());
+                newFormula.setWolframFormula(formula.getWolfram());
+                newFormula.setPath(path);
+                mDatabase.getFormulasDao().addFormula(newFormula);
             }).start();
             return formula;
         }
+    }
+
+    public List<FormulaDB> loadFormulasFromDB() {
+        return mDatabase.getFormulasDao().getAllFormulas();
     }
 
     private Formula loadFormulaViaRetrofit(String src) throws IOException {

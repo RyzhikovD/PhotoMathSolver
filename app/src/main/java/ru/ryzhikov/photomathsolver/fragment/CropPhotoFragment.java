@@ -18,8 +18,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
@@ -39,7 +41,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
     private ImageView mImageView;
     private View mProgressRelativeLayout;
-//    BottomAppBar mBottomBar;
+    BottomAppBar mBottomBar;
 
     private int targetW;
     private int targetH;
@@ -68,16 +70,16 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         super.onViewCreated(view, savedInstanceState);
         mImageView = view.findViewById(R.id.image_photo);
         mProgressRelativeLayout = view.findViewById(R.id.relative_layout_progress);
-//        mBottomBar = view.findViewById(R.id.bar);
-//        ((AppCompatActivity) requireActivity()).setSupportActionBar(mBottomBar);
+        mBottomBar = view.findViewById(R.id.bar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(mBottomBar);
         view.findViewById(R.id.button_crop).setOnClickListener(this);
         view.findViewById(R.id.button_scan).setOnClickListener(this);
     }
 
 //    @Override
 //    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-//        inflater.inflate(R.menu.bottom_app_bar_menu, menu);
 //        super.onCreateOptionsMenu(menu, inflater);
+//        inflater.inflate(R.menu.bottom_app_bar_menu, menu);
 //    }
 
     @Override

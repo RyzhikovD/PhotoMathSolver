@@ -9,9 +9,11 @@ import androidx.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import ru.ryzhikov.photomathsolver.data.FormulasRepository;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
+import ru.ryzhikov.photomathsolver.data.room.FormulaDB;
 
 public class WebDataProvider {
 
@@ -55,5 +57,14 @@ public class WebDataProvider {
 
     public Formula loadFormula(String path, String base64Photo) throws IOException {
         return mFormulasRepository.loadFormula(path, base64Photo);
+    }
+
+    public List<FormulaDB> loadFormulasFromDB() {
+        List<FormulaDB> formulasDB= mFormulasRepository.loadFormulasFromDB();
+//        List<Formula> formulas = new ArrayList<>(formulasDB.size());
+//        for (FormulaDB formulaDB : formulasDB) {
+//            formulas.add(new Formula(formulaDB.getLatexFormula(), formulaDB.getWolframFormula()));
+//        }
+        return formulasDB;
     }
 }

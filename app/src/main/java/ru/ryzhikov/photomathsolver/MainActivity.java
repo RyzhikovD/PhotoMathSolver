@@ -3,6 +3,7 @@ package ru.ryzhikov.photomathsolver;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -35,6 +36,12 @@ public class MainActivity extends AppCompatActivity {
                 chooseImage();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bottom_app_bar_menu, menu);
+        return true;
     }
 
     @Override

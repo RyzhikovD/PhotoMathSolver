@@ -1,31 +1,45 @@
 package ru.ryzhikov.photomathsolver.fragment;
 
-import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 import ru.ryzhikov.photomathsolver.R;
+import ru.ryzhikov.photomathsolver.adapter.FormulasAdapter;
+import ru.ryzhikov.photomathsolver.data.room.FormulaDB;
+import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
 
 public class ImageListFragment extends Fragment {
 
-    private static final String WOLFRAM_INPUT_URL = "https://www.wolframalpha.com/input/?i=";
-    private final String mURL;
+    private WebDataProvider mWebDataProvider;
+    private RecyclerView mRecyclerView;
+    private List<FormulaDB> mFormulas;
+    private FormulasAdapter.OnFormulaClickListener mOnFormulaClickListener = (formula) ->
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.root, EditFormulaFragment
+                            .newInstance(formula.getLatexFormula(), formula.getWolframFormula()))
+                    .addToBackStack(EditFormulaFragment.class.getSimpleName())
+                    .commit();
 
-    private WebView mWebView;
-
-    static ImageListFragment newInstance(String editedFormula) {
-        return new ImageListFragment(editedFormula);
+    static ImageListFragment newInstance() {
+        return new ImageListFragment();
     }
 
-    private ImageListFragment(String editedFormula) {
-        mURL = WOLFRAM_INPUT_URL + editedFormula;
+    {
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -37,15 +51,68 @@ public class ImageListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mWebView = view.findViewById(R.id.web_view);
+        mRecyclerView = view.findViewById(R.id.recycler_view_images);
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadUrl(mURL);
+
+        mWebDataProvider = new WebDataProvider(requireContext());
+        if (mFormulas == null) {
+            new LoadFormulasTask(this).execute();
+        } else {
+            initRecyclerView(mFormulas);
+        }
+    }
+
+    private void initRecyclerView(List<FormulaDB> formulas) {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        FormulasAdapter formulasAdapter = new FormulasAdapter();
+        formulasAdapter.setNotes(formulas);
+        formulasAdapter.setClickListener(mOnFormulaClickListener);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        mRecyclerView.setAdapter(formulasAdapter);
+    }
+
+    private static class LoadFormulasTask extends AsyncTask<Void, Void, List<FormulaDB>> {
+        private final WeakReference<ImageListFragment> mFragmentRef;
+
+        private final WebDataProvider mProvider;
+
+        private LoadFormulasTask(@NonNull ImageListFragment fragment) {
+            mFragmentRef = new WeakReference<>(fragment);
+            mProvider = fragment.mWebDataProvider;
+        }
+
+        @Override
+        protected void onPreExecute() {
+//            ImageListFragment fragment = mFragmentRef.get();
+//            if (fragment != null) {
+//                fragment.mLoadingView.setVisibility(View.VISIBLE);
+//            }
+        }
+
+        @Override
+        protected List<FormulaDB> doInBackground(Void... arg) {
+            return mProvider.loadFormulasFromDB();
+        }
+
+        @Override
+        protected void onPostExecute(List<FormulaDB> formulas) {
+            ImageListFragment fragment = mFragmentRef.get();
+            if (fragment == null) {
+                return;
+            }
+//            fragment.mLoadingView.setVisibility(View.GONE);
+            if (formulas == null) {
+                Toast.makeText(fragment.requireContext(), R.string.failed_to_load_formulas, Toast.LENGTH_SHORT).show();
+            } else {
+                fragment.initRecyclerView(formulas);
+            }
+        }
 
     }
 }

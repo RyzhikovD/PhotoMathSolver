@@ -1,6 +1,5 @@
 package ru.ryzhikov.photomathsolver.data.room;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -13,7 +12,7 @@ import java.util.List;
 public interface FormulasDAO {
 
     @Query("SELECT * FROM FormulaDB")
-    LiveData<List<FormulaDB>> getAllFormulas();
+    List<FormulaDB> getAllFormulas();
 
     @Query("SELECT * FROM FormulaDB WHERE id = :formulaId")
     FormulaDB getFormulaById(long formulaId);
