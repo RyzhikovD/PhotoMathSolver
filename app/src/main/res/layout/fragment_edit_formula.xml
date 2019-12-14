@@ -11,13 +11,6 @@
         android:layout_weight="5"
         android:contentDescription="@string/image_of_formula" />
 
-    <Button
-        android:id="@+id/button_update_image"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="@string/update_image" />
-
     <EditText
         android:id="@+id/edit_text_formula"
         android:layout_width="match_parent"

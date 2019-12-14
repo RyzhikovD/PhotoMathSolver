@@ -46,6 +46,5 @@ public class WebViewFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl(mURL);
-
     }
 }

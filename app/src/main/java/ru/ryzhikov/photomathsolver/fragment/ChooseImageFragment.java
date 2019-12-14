@@ -63,8 +63,7 @@ public class ChooseImageFragment extends Fragment implements View.OnClickListene
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             requireActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))
-                    .replace(R.id.root, ImageListFragment.newInstance())
+                    .replace(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))
                     .addToBackStack(CropPhotoFragment.class.getSimpleName())
                     .commit();
         } else if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -85,8 +84,7 @@ public class ChooseImageFragment extends Fragment implements View.OnClickListene
 
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-//                    .replace(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))
-                    .replace(R.id.root, ImageListFragment.newInstance())
+                    .replace(R.id.root, CropPhotoFragment.newInstance(mImageUri, mCurrentPhotoPath))
                     .addToBackStack(CropPhotoFragment.class.getSimpleName())
                     .commit();
         }

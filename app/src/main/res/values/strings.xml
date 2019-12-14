@@ -10,4 +10,5 @@
     <string name="choose_from_gallery">Choose from gallery</string>
     <string name="loading_process">Image processing. Please, wait…</string>
     <string name="failed_to_load_formulas">Failed to load formulas from database</string>
+    <string name="scanned_photos">Scanned photos</string>
 </resources>

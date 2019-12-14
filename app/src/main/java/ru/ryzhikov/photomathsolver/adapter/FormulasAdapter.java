@@ -66,9 +66,6 @@ public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private class FormulaHolder extends RecyclerView.ViewHolder {
 
         private ImageView mPhoto;
-        private String mWolframText;
-        private String mLatexText;
-
 
         public FormulaHolder(@NonNull View itemView) {
             super(itemView);
@@ -79,15 +76,6 @@ public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Bitmap bitmap = BitmapFactory.decodeFile(formula.getPath());
             mPhoto.setImageBitmap(bitmap);
 
-//            File imgFile = new File(formula.getPath());
-//
-//            if(imgFile.exists()){
-//                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//                mPhoto.setImageBitmap(bitmap);
-//            }
-
-            mWolframText = formula.getWolframFormula();
-            mLatexText = formula.getLatexFormula();
             itemView.setOnClickListener(v -> {
                 if (mClickListener != null) {
                     mClickListener.onItemClick(formula);

@@ -11,10 +11,8 @@ import androidx.room.RoomDatabase;
 import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -30,7 +28,6 @@ public class FormulasRepository {
     private static final String[] FORMATS = {"latex_normal", "wolfram"};
 
     private final IPhotoScanService mPhotoScanService;
-    private final Context mContext;
 
     private FormulasDatabase mDatabase;
     private LiveData<List<FormulaDB>> mLiveData;
@@ -41,16 +38,13 @@ public class FormulasRepository {
 
         OkHttpClient.Builder client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(@NonNull Interceptor.Chain chain) throws IOException {
-                        Request request = chain.request().newBuilder()
-                                .addHeader("content-type", "application/json")
-                                .addHeader("app_id", "ryzhikov_dmvl_gmail_com")    //мой id для Mathpix
-                                .addHeader("app_key", "28d1ed4c4d6458420a3f")   //мой ключ
-                                .build();
-                        return chain.proceed(request);
-                    }
+                .addInterceptor(chain -> {
+                    Request request = chain.request().newBuilder()
+                            .addHeader("content-type", "application/json")
+                            .addHeader("app_id", "ryzhikov_dmvl_gmail_com")    //мой id для Mathpix
+                            .addHeader("app_key", "28d1ed4c4d6458420a3f")   //мой ключ
+                            .build();
+                    return chain.proceed(request);
                 });
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -60,7 +54,6 @@ public class FormulasRepository {
                 .build();
         mPhotoScanService = retrofit.create(IPhotoScanService.class);
 
-        mContext = context;
         RoomDatabase.Builder<FormulasDatabase> builder = Room.databaseBuilder(context, FormulasDatabase.class, "formulas");
         mDatabase = builder.build();
     }

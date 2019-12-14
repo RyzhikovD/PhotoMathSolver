@@ -16,12 +16,4 @@ public class URLConverter {
         return wolframFormula
                 .replace("+", "%2B");
     }
-
-    public static String getLatexFromWolfram(String wolframFormula) {
-        return wolframFormula
-                .replace("(", "{")
-                .replace(")", "}")
-                .replace("to", "\\rightarrow")
-                .replace("+", "%2B");
-    }
 }

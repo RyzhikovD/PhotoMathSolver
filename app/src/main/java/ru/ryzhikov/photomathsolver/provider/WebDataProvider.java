@@ -51,7 +51,6 @@ public class WebDataProvider {
                 }
             }
         }
-//        mImage = image != null ? image.copy(image.getConfig(), true) : null;
         return image;
     }
 
@@ -60,11 +59,6 @@ public class WebDataProvider {
     }
 
     public List<FormulaDB> loadFormulasFromDB() {
-        List<FormulaDB> formulasDB= mFormulasRepository.loadFormulasFromDB();
-//        List<Formula> formulas = new ArrayList<>(formulasDB.size());
-//        for (FormulaDB formulaDB : formulasDB) {
-//            formulas.add(new Formula(formulaDB.getLatexFormula(), formulaDB.getWolframFormula()));
-//        }
-        return formulasDB;
+        return mFormulasRepository.loadFormulasFromDB();
     }
 }

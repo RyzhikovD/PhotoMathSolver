@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.ryzhikov.photomathsolver.R;
@@ -62,15 +63,15 @@ public class ImageListFragment extends Fragment {
         if (mFormulas == null) {
             new LoadFormulasTask(this).execute();
         } else {
-            initRecyclerView(mFormulas);
+            initRecyclerView();
         }
     }
 
-    private void initRecyclerView(List<FormulaDB> formulas) {
+    private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         FormulasAdapter formulasAdapter = new FormulasAdapter();
-        formulasAdapter.setNotes(formulas);
+        formulasAdapter.setNotes(mFormulas);
         formulasAdapter.setClickListener(mOnFormulaClickListener);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
@@ -89,10 +90,6 @@ public class ImageListFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-//            ImageListFragment fragment = mFragmentRef.get();
-//            if (fragment != null) {
-//                fragment.mLoadingView.setVisibility(View.VISIBLE);
-//            }
         }
 
         @Override
@@ -106,11 +103,11 @@ public class ImageListFragment extends Fragment {
             if (fragment == null) {
                 return;
             }
-//            fragment.mLoadingView.setVisibility(View.GONE);
             if (formulas == null) {
                 Toast.makeText(fragment.requireContext(), R.string.failed_to_load_formulas, Toast.LENGTH_SHORT).show();
             } else {
-                fragment.initRecyclerView(formulas);
+                fragment.mFormulas = new ArrayList<>(formulas);
+                fragment.initRecyclerView();
             }
         }
 

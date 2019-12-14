@@ -51,7 +51,6 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         mEditFormula = view.findViewById(R.id.edit_text_formula);
         mImageView = view.findViewById(R.id.image_of_formula);
         view.findViewById(R.id.button_solve).setOnClickListener(this);
-        view.findViewById(R.id.button_update_image).setOnClickListener(this);
     }
 
     @Override
@@ -63,16 +62,11 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_solve:
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForWolframFormula(mEditFormula.getText().toString())))
-                        .addToBackStack(WebViewFragment.class.getSimpleName())
-                        .commit();
-                break;
-            case R.id.button_update_image:
-                loadImage(URLConverter.getLatexFromWolfram(mEditFormula.getText().toString()));
-                break;
+        if (v.getId() == R.id.button_solve) {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForWolframFormula(mEditFormula.getText().toString())))
+                    .addToBackStack(WebViewFragment.class.getSimpleName())
+                    .commit();
         }
     }
 
