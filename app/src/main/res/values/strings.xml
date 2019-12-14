@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PhotoMathSolver</string>
+    <string name="photo">Photo</string>
+    <string name="crop">Crop Image</string>
+    <string name="solve">Solve</string>
+    <string name="scan_photo">Scan Photo</string>
+    <string name="image_of_formula">Image Of Formula</string>
+    <string name="update_image">Update Image</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="loading_process">Image processing. Please, wait…</string>
+    <string name="failed_to_load_formulas">Failed to load formulas from database</string>
+    <string name="scanned_photos">Scanned photos</string>
+</resources>
