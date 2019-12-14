@@ -78,6 +78,8 @@ public class ImageListFragment extends Fragment {
         mRecyclerView.setAdapter(formulasAdapter);
     }
 
+    // асинк таск желательно в презентер/вью модель перенести
+    // на занятии мы делали асинк таск во фрагменте, потому что MVP ещё не проходили
     private static class LoadFormulasTask extends AsyncTask<Void, Void, List<FormulaDB>> {
         private final WeakReference<ImageListFragment> mFragmentRef;
 

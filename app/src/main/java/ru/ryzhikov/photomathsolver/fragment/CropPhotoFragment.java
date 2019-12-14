@@ -27,6 +27,7 @@ import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.data.model.Formula;
 import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
 
+// хорошо бы разнести все классы/пакеты на domain/data/presentation
 public class CropPhotoFragment extends Fragment implements View.OnClickListener {
 
     private static final int DEFAULT_IMAGE_COMPRESSION = 4;
@@ -154,6 +155,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
         return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
     }
 
+    // все async task надо положить в презентер или вью модель
     private static class DownloadFormulaTask extends AsyncTask<Bitmap, String, Formula> {
 
         private final WeakReference<CropPhotoFragment> mFragmentReference;

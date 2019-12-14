@@ -39,6 +39,7 @@ public class Formula {
     public static class DetectionMap {
         @SerializedName("contains_chart")
         @Expose
+        // snake-case не надо, обычный camelCase: mContainsChart, аналогично с остальными полями
         public double contains_chart;
 
         @SerializedName("contains_diagram")
