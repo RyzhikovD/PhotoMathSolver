@@ -1,7 +1,5 @@
 package ru.ryzhikov.photomathsolver.presentation.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +14,7 @@ import java.util.List;
 
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.domain.model.Formula;
+import ru.ryzhikov.photomathsolver.presentation.PhotoMathSolverViewModel;
 
 public class FormulasAdapter extends RecyclerView.Adapter<FormulasAdapter.FormulaHolder> {
 
@@ -58,8 +57,7 @@ public class FormulasAdapter extends RecyclerView.Adapter<FormulasAdapter.Formul
         }
 
         public void bind(Formula formula) {
-            Bitmap bitmap = BitmapFactory.decodeFile(formula.getImagePath());
-            mPhoto.setImageBitmap(bitmap);
+            mPhoto.setImageBitmap(PhotoMathSolverViewModel.getBitmap(formula.getImagePath()));
 
             itemView.setOnClickListener(v -> {
                 if (mClickListener != null) {

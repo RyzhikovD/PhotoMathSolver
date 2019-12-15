@@ -20,6 +20,7 @@ public class ImageListFragment extends Fragment {
 
     private PhotoMathSolverViewModel mViewModel;
     private RecyclerView mRecyclerView;
+    private View mLoadingView;
     private FormulasAdapter.OnFormulaClickListener mOnFormulaClickListener = (formula) ->
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.root, EditFormulaFragment.newInstance(formula, mViewModel))
@@ -34,7 +35,7 @@ public class ImageListFragment extends Fragment {
         return new ImageListFragment(viewModel);
     }
 
-    public ImageListFragment(PhotoMathSolverViewModel viewModel) {
+    private ImageListFragment(PhotoMathSolverViewModel viewModel) {
         mViewModel = viewModel;
     }
 
@@ -48,6 +49,7 @@ public class ImageListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.recycler_view_images);
+        mLoadingView = view.findViewById(R.id.progress_view);
     }
 
     @Override
@@ -56,14 +58,16 @@ public class ImageListFragment extends Fragment {
 
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
         mViewModel.getFormulas().observe(this, formulas -> {
             FormulasAdapter formulasAdapter = new FormulasAdapter(formulas);
             formulasAdapter.setClickListener(mOnFormulaClickListener);
             mRecyclerView.setAdapter(formulasAdapter);
         });
-//        mViewModel.isLoading().observe(this, isLoading ->
-//                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+        mViewModel.isLoading().observe(this, isLoading ->
+                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
         mViewModel.getErrors().observe(this, error ->
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show());
         mViewModel.loadFormulasFromDB();

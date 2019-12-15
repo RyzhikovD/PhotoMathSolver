@@ -23,6 +23,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     private final PhotoMathSolverViewModel mViewModel;
     private EditText mEditFormula;
     private ImageView mImageView;
+    private View mLoadingView;
 
     {
         setRetainInstance(true);
@@ -48,6 +49,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         super.onViewCreated(view, savedInstanceState);
         mEditFormula = view.findViewById(R.id.edit_text_formula);
         mImageView = view.findViewById(R.id.image_of_formula);
+        mLoadingView = view.findViewById(R.id.progress_view);
         view.findViewById(R.id.button_solve).setOnClickListener(this);
     }
 
@@ -56,8 +58,8 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
         mEditFormula.setText(mFormula.getWolfram());
         mViewModel.getImage().observe(this, bitmap -> mImageView.setImageBitmap(bitmap));
-//        mViewModel.isLoading().observe(this, isLoading ->
-//                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+        mViewModel.isLoading().observe(this, isLoading ->
+                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
         mViewModel.getErrors().observe(this, error ->
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show());
         mViewModel.loadImageForFormula(URLConverter.getUrlForLatexFormula(mFormula.getLatex()));

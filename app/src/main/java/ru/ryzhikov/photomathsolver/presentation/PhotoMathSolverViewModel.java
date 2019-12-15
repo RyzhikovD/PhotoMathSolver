@@ -1,6 +1,7 @@
 package ru.ryzhikov.photomathsolver.presentation;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,8 @@ import ru.ryzhikov.photomathsolver.domain.model.Formula;
 import ru.ryzhikov.photomathsolver.presentation.utils.IResourceWrapper;
 
 public class PhotoMathSolverViewModel extends ViewModel {
+
+    private static final int DEFAULT_IMAGE_COMPRESSION = 4;
 
     private final FormulasInteractor mFormulasInteractor;
     private final Executor mExecutor;
@@ -72,10 +75,18 @@ public class PhotoMathSolverViewModel extends ViewModel {
         });
     }
 
-    private static String bitmapToBase64(Bitmap image) {
+    private String bitmapToBase64(Bitmap image) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 100, os);
         return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
+    }
+
+    public static Bitmap getBitmap(String imagePath) {
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = DEFAULT_IMAGE_COMPRESSION;
+        bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        return BitmapFactory.decodeFile(imagePath, bmOptions);
     }
 
     @NonNull

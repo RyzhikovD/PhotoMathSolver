@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -41,7 +40,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
     private static final int CAMERA_REQUEST = 0;
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int DEFAULT_IMAGE_COMPRESSION = 4;
 
     private Uri mImageUri;
     private String mCurrentPhotoPath;
@@ -76,7 +74,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mLoadingView = view.findViewById(R.id.progress_frame_layout);
+        mLoadingView = view.findViewById(R.id.progress_view);
         (mImageView = view.findViewById(R.id.image_photo)).setOnClickListener(this);
 
         (mCropButton = view.findViewById(R.id.button_crop)).setOnClickListener(this);
@@ -102,16 +100,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
             if (result != null) {
                 if (resultCode == Activity.RESULT_OK) {
                     mImageUri = result.getUri();
-
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    bmOptions.inJustDecodeBounds = true;
-
-                    bmOptions.inJustDecodeBounds = false;
-                    bmOptions.inSampleSize = DEFAULT_IMAGE_COMPRESSION;
-                    bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-
-                    mBitmap = BitmapFactory.decodeFile(mImageUri.getPath(), bmOptions);
-
+                    mBitmap = PhotoMathSolverViewModel.getBitmap(mImageUri.getPath());
                     mImageView.setImageBitmap(mBitmap);
                     showImage();
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -120,14 +109,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 }
             }
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = DEFAULT_IMAGE_COMPRESSION;
-            bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-
-            mBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            mBitmap = PhotoMathSolverViewModel.getBitmap(mCurrentPhotoPath);
             mImageView.setImageBitmap(mBitmap);
             showImage();
         } else if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -148,14 +130,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 }
             }
 
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = DEFAULT_IMAGE_COMPRESSION;
-            bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-
-            mBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            mBitmap = PhotoMathSolverViewModel.getBitmap(mCurrentPhotoPath);
             mImageView.setImageBitmap(mBitmap);
             showImage();
         }
