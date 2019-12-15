@@ -1,7 +1,7 @@
-package ru.ryzhikov.photomathsolver.utils;
+package ru.ryzhikov.photomathsolver.domain.utils;
 
 /**
- *  Используется для преобразования строки в параметр url
+ * Используется для преобразования строки в параметр url
  */
 public class URLConverter {
 

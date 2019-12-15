@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver.fragment;
+package ru.ryzhikov.photomathsolver.presentation.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,38 +6,36 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ru.ryzhikov.photomathsolver.BuildConfig;
 import ru.ryzhikov.photomathsolver.R;
-import ru.ryzhikov.photomathsolver.data.model.Formula;
-import ru.ryzhikov.photomathsolver.provider.FileProvider;
-import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
+import ru.ryzhikov.photomathsolver.domain.FileProvider;
+import ru.ryzhikov.photomathsolver.presentation.FormulaViewModelFactory;
+import ru.ryzhikov.photomathsolver.presentation.PhotoMathSolverViewModel;
 
 public class CropPhotoFragment extends Fragment implements View.OnClickListener {
 
@@ -47,11 +45,12 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
     private Uri mImageUri;
     private String mCurrentPhotoPath;
-
-    private ImageView mImageView;
     private Bitmap mBitmap;
 
-    private WebDataProvider mWebDataProvider;
+    private ImageView mImageView;
+    private View mLoadingView;
+
+    private PhotoMathSolverViewModel mViewModel;
 
     private FloatingActionButton mCropButton;
     private ExtendedFloatingActionButton mScanButton;
@@ -77,6 +76,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mLoadingView = view.findViewById(R.id.progress_frame_layout);
         (mImageView = view.findViewById(R.id.image_photo)).setOnClickListener(this);
 
         (mCropButton = view.findViewById(R.id.button_crop)).setOnClickListener(this);
@@ -90,7 +90,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mWebDataProvider = new WebDataProvider(requireContext());
+        setupMVVM();
     }
 
     @Override
@@ -168,9 +168,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 CropImage.activity(mImageUri).start(requireActivity(), this);
                 break;
             case R.id.button_scan:
-                v.getRootView().findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
-                v.getRootView().findViewById(R.id.progress_text).setVisibility(View.VISIBLE);
-                loadImage(mBitmap);
+                mViewModel.scanImage(mCurrentPhotoPath, mBitmap);
                 break;
             case R.id.button_select_image:
                 final Animation galleryButtonAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.animation_for_gallery_button);
@@ -200,7 +198,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 mCameraButton.startAnimation(cameraButtonAnimation);
                 break;
             case R.id.image_photo:
-                if(mGalleryButton.isEnabled()) {
+                if (mGalleryButton.isEnabled()) {
                     mGalleryButton.setEnabled(false);
                     mScannedPicturesButton.setEnabled(false);
                     mCameraButton.setEnabled(false);
@@ -230,11 +228,25 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.button_scanned_photos:
                 requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, ImageListFragment.newInstance())
+                        .replace(R.id.root, ImageListFragment.newInstance(mViewModel))
                         .addToBackStack(ImageListFragment.class.getSimpleName())
                         .commit();
                 break;
         }
+    }
+
+    private void setupMVVM() {
+        mViewModel = ViewModelProviders.of(this, new FormulaViewModelFactory(requireContext()))
+                .get(PhotoMathSolverViewModel.class);
+        mViewModel.getFormula().observe(this, formula ->
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root, EditFormulaFragment.newInstance(formula, mViewModel))
+                        .addToBackStack(EditFormulaFragment.class.getSimpleName())
+                        .commit());
+        mViewModel.isLoading().observe(this, isLoading ->
+                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+        mViewModel.getErrors().observe(this, error ->
+                Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show());
     }
 
     private void showImage() {
@@ -304,63 +316,5 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
 
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
-    }
-
-    private void scan(Formula formula) {
-        String test = "\\int _ { 0 } ^ { a } \\frac { 1 } { 2 x ^ { 2 } + 123 } d x";
-
-        String latexFormula = formula == null ? test : formula.getLatex();
-        String wolframFormula = formula == null ? test : formula.getWolfram();
-
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.root, EditFormulaFragment.newInstance(latexFormula, wolframFormula))
-                .addToBackStack(EditFormulaFragment.class.getSimpleName())
-                .commit();
-    }
-
-    private void loadImage(Bitmap bitmap) {
-        DownloadFormulaTask downloadFormulaTask = new DownloadFormulaTask(this);
-        downloadFormulaTask.execute(bitmap);
-    }
-
-    private static String bitmapToBase64(Bitmap image) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, os);
-        return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
-    }
-
-    private static class DownloadFormulaTask extends AsyncTask<Bitmap, String, Formula> {
-
-        private final WeakReference<CropPhotoFragment> mFragmentReference;
-        private final WebDataProvider mProvider;
-        private final String mPath;
-
-
-        private DownloadFormulaTask(@NonNull CropPhotoFragment fragment) {
-            mFragmentReference = new WeakReference<>(fragment);
-            mProvider = fragment.mWebDataProvider;
-            mPath = fragment.mCurrentPhotoPath;
-        }
-
-        protected Formula doInBackground(Bitmap... bitmaps) {
-            try {
-                return mProvider.loadFormula(mPath, bitmapToBase64(bitmaps[0]));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        protected void onPostExecute(Formula formula) {
-            CropPhotoFragment fragment = mFragmentReference.get();
-            if (fragment == null) {
-                return;
-            }
-
-            fragment.requireView().findViewById(R.id.progress_bar).setVisibility(View.GONE);
-            fragment.requireView().findViewById(R.id.progress_text).setVisibility(View.GONE);
-
-            fragment.scan(formula);
-        }
     }
 }

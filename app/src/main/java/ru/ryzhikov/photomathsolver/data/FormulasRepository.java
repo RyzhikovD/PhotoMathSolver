@@ -1,14 +1,18 @@
 package ru.ryzhikov.photomathsolver.data;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
+import androidx.annotation.Nullable;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -17,20 +21,23 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.ryzhikov.photomathsolver.data.model.Formula;
+import ru.ryzhikov.photomathsolver.data.model.FormulaData;
 import ru.ryzhikov.photomathsolver.data.model.RequestBody;
 import ru.ryzhikov.photomathsolver.data.room.FormulaDB;
 import ru.ryzhikov.photomathsolver.data.room.FormulasDatabase;
+import ru.ryzhikov.photomathsolver.domain.IFormulasRepository;
+import ru.ryzhikov.photomathsolver.domain.model.Formula;
 
-public class FormulasRepository {
+public class FormulasRepository implements IFormulasRepository {
 
     private static final String BASE_URL = "https://api.mathpix.com";
     private static final String[] FORMATS = {"latex_normal", "wolfram"};
+    private static final String IMAGE_ROOT_URL = "https://chart.googleapis.com/chart?cht=tx&chl=";
+    private static final String SIZE_OF_IMAGE_URL_ARGUMENT = "&chs=200";
 
     private final IPhotoScanService mPhotoScanService;
-
-    private FormulasDatabase mDatabase;
-    private LiveData<List<FormulaDB>> mLiveData;
+    private final FormulasDatabase mDatabase;
+    private final FormulasConverter mFormulasConverter = new FormulasConverter();
 
     public FormulasRepository(Context context) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -41,8 +48,8 @@ public class FormulasRepository {
                 .addInterceptor(chain -> {
                     Request request = chain.request().newBuilder()
                             .addHeader("content-type", "application/json")
-                            .addHeader("app_id", "ryzhikov_dmvl_gmail_com")    //мой id для Mathpix
-                            .addHeader("app_key", "28d1ed4c4d6458420a3f")   //мой ключ
+                            .addHeader("app_id", "ryzhikov_dmvl_gmail_com")
+                            .addHeader("app_key", "28d1ed4c4d6458420a3f")
                             .build();
                     return chain.proceed(request);
                 });
@@ -63,36 +70,56 @@ public class FormulasRepository {
         FormulaDB formulaDB = mDatabase.getFormulasDao().getFormulaByPath(path);
         if (formulaDB != null) {
             Log.d("Repository", "loadFormulaViaDB() called");
-            return new Formula(formulaDB.getLatexFormula(), formulaDB.getWolframFormula());
+            return mFormulasConverter.convert(formulaDB);
         } else {
-            final Formula formula = loadFormulaViaRetrofit(src);
+            final FormulaData formulaData = loadFormulaViaRetrofit(src);
             new Thread(() -> {
                 final FormulaDB newFormula = new FormulaDB();
-                newFormula.setLatexFormula(formula.getLatex());
-                newFormula.setWolframFormula(formula.getWolfram());
+                newFormula.setLatexFormula(formulaData.getLatex());
+                newFormula.setWolframFormula(formulaData.getWolfram());
                 newFormula.setPath(path);
                 mDatabase.getFormulasDao().addFormula(newFormula);
             }).start();
-            return formula;
+            return mFormulasConverter.convert(formulaData, path);
         }
     }
 
-    public List<FormulaDB> loadFormulasFromDB() {
-        return mDatabase.getFormulasDao().getAllFormulas();
+    public List<Formula> loadFormulasFromDB() {
+        return mFormulasConverter.convert(mDatabase.getFormulasDao().getAllFormulas());
     }
 
-    private Formula loadFormulaViaRetrofit(String src) throws IOException {
+    @Nullable
+    public Bitmap loadImageForFormula(String latexFormula) {
+        Bitmap image = null;
+        InputStream is = null;
+
+        try {
+            is = new URL(IMAGE_ROOT_URL + latexFormula + SIZE_OF_IMAGE_URL_ARGUMENT).openStream();
+            image = BitmapFactory.decodeStream(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return image;
+    }
+
+    private FormulaData loadFormulaViaRetrofit(String src) throws IOException {
 
         Log.d("Repository", "loadFormulaViaRetrofit() called");
 
         RequestBody requestBody = new RequestBody("data:image/jpeg;base64," + src, FORMATS);
-        Call<Formula> listCall = mPhotoScanService.scanImage(requestBody);
-        retrofit2.Response<Formula> response = listCall.execute();
+        Call<FormulaData> listCall = mPhotoScanService.scanImage(requestBody);
+        retrofit2.Response<FormulaData> response = listCall.execute();
         if (response.body() == null || response.errorBody() != null) {
             throw new IOException("Не удалось отсканировать фото");
         }
         return response.body();
     }
-
-
 }

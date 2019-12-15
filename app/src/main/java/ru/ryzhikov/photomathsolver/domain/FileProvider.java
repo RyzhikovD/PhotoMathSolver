@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver.provider;
+package ru.ryzhikov.photomathsolver.domain;
 
 /**
  * Используется для сохранения фото. Объявлен в manifest как provider

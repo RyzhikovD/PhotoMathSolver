@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver;
+package ru.ryzhikov.photomathsolver.presentation;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import ru.ryzhikov.photomathsolver.fragment.CropPhotoFragment;
+import ru.ryzhikov.photomathsolver.R;
+import ru.ryzhikov.photomathsolver.presentation.fragment.CropPhotoFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private void chooseImage() {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.root, CropPhotoFragment.newInstance())
-//                .add(R.id.root, CropPhotoFragment.newInstance(null, null))
-//                .add(R.id.root, ChooseImageFragment.newInstance())
                 .commit();
     }
 }

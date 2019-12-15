@@ -8,7 +8,7 @@ public class RequestBody {
     final String[] formats;
 
     /**
-     * @param url - фото в формате base64
+     * @param url     - фото в формате base64
      * @param formats - форматы полученного текста. В данном случае:
      *                latex и текст, адаптированный для wolfram
      */

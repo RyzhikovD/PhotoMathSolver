@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver.adapter;
+package ru.ryzhikov.photomathsolver.presentation.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,32 +12,31 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import ru.ryzhikov.photomathsolver.R;
-import ru.ryzhikov.photomathsolver.data.room.FormulaDB;
+import ru.ryzhikov.photomathsolver.domain.model.Formula;
 
-public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FormulasAdapter extends RecyclerView.Adapter<FormulasAdapter.FormulaHolder> {
 
-    private List<FormulaDB> mFormulas = Collections.emptyList();
+    private List<Formula> mFormulas;
     private OnFormulaClickListener mClickListener;
 
-    public FormulasAdapter() {
-        setHasStableIds(true);
+    public FormulasAdapter(List<Formula> formulas) {
+        mFormulas = new ArrayList<>(formulas);
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FormulaHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new FormulaHolder(
                 LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_formula, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ((FormulaHolder) holder).bind(mFormulas.get(position));
+    public void onBindViewHolder(@NonNull FormulaHolder holder, int position) {
+        holder.bind(mFormulas.get(position));
     }
 
     @Override
@@ -45,25 +44,11 @@ public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mFormulas == null ? 0 : mFormulas.size();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return mFormulas.get(position).getId();
-    }
-
-    public void setNotes(@Nullable List<FormulaDB> formulas) {
-        if (formulas == null) {
-            mFormulas = new ArrayList<>();
-        } else {
-            mFormulas = new ArrayList<>(formulas);
-        }
-        notifyDataSetChanged();
-    }
-
     public void setClickListener(@Nullable OnFormulaClickListener clickListener) {
         mClickListener = clickListener;
     }
 
-    private class FormulaHolder extends RecyclerView.ViewHolder {
+    class FormulaHolder extends RecyclerView.ViewHolder {
 
         private ImageView mPhoto;
 
@@ -72,8 +57,8 @@ public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mPhoto = itemView.findViewById(R.id.photo_item);
         }
 
-        public void bind(FormulaDB formula) {
-            Bitmap bitmap = BitmapFactory.decodeFile(formula.getPath());
+        public void bind(Formula formula) {
+            Bitmap bitmap = BitmapFactory.decodeFile(formula.getImagePath());
             mPhoto.setImageBitmap(bitmap);
 
             itemView.setOnClickListener(v -> {
@@ -90,6 +75,6 @@ public class FormulasAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
          *
          * @param formula на элемент списка с какой формулой нажали
          */
-        void onItemClick(@NonNull FormulaDB formula);
+        void onItemClick(@NonNull Formula formula);
     }
 }

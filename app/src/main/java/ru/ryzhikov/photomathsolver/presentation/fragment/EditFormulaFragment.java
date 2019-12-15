@@ -1,28 +1,26 @@
-package ru.ryzhikov.photomathsolver.fragment;
+package ru.ryzhikov.photomathsolver.presentation.fragment;
 
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.lang.ref.WeakReference;
-
 import ru.ryzhikov.photomathsolver.R;
-import ru.ryzhikov.photomathsolver.provider.WebDataProvider;
-import ru.ryzhikov.photomathsolver.utils.URLConverter;
+import ru.ryzhikov.photomathsolver.domain.model.Formula;
+import ru.ryzhikov.photomathsolver.domain.utils.URLConverter;
+import ru.ryzhikov.photomathsolver.presentation.PhotoMathSolverViewModel;
 
 public class EditFormulaFragment extends Fragment implements View.OnClickListener {
 
-    private final String mLatexFormula;
-    private final String mWolframFormula;
+    private final Formula mFormula;
+    private final PhotoMathSolverViewModel mViewModel;
     private EditText mEditFormula;
     private ImageView mImageView;
 
@@ -30,13 +28,13 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         setRetainInstance(true);
     }
 
-    static EditFormulaFragment newInstance(String latexFormula, String wolframFormula) {
-        return new EditFormulaFragment(latexFormula, wolframFormula);
+    static EditFormulaFragment newInstance(Formula formula, PhotoMathSolverViewModel viewModel) {
+        return new EditFormulaFragment(formula, viewModel);
     }
 
-    private EditFormulaFragment(String latexFormula, String wolframFormula) {
-        mLatexFormula = latexFormula;
-        mWolframFormula = wolframFormula;
+    private EditFormulaFragment(Formula formula, PhotoMathSolverViewModel viewModel) {
+        mFormula = formula;
+        mViewModel = viewModel;
     }
 
     @Nullable
@@ -56,8 +54,13 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mEditFormula.setText(mWolframFormula);
-        loadImage(URLConverter.getUrlForLatexFormula(mLatexFormula));
+        mEditFormula.setText(mFormula.getWolfram());
+        mViewModel.getImage().observe(this, bitmap -> mImageView.setImageBitmap(bitmap));
+//        mViewModel.isLoading().observe(this, isLoading ->
+//                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+        mViewModel.getErrors().observe(this, error ->
+                Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show());
+        mViewModel.loadImageForFormula(URLConverter.getUrlForLatexFormula(mFormula.getLatex()));
     }
 
     @Override
@@ -68,36 +71,5 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
                     .addToBackStack(WebViewFragment.class.getSimpleName())
                     .commit();
         }
-    }
-
-    private void loadImage(String formula) {
-        DownloadImageTask downloadImageTask = new DownloadImageTask(this);
-        downloadImageTask.execute(formula);
-    }
-
-    private void updateImage(Bitmap image) {
-        mImageView.setImageBitmap(image);
-    }
-
-    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-
-        private final WeakReference<EditFormulaFragment> mFragmentReference;
-
-        private DownloadImageTask(@NonNull EditFormulaFragment fragment) {
-            mFragmentReference = new WeakReference<>(fragment);
-        }
-
-        protected Bitmap doInBackground(String... formulas) {
-            return WebDataProvider.loadImage(formulas[0]);
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            EditFormulaFragment fragment = mFragmentReference.get();
-            if (fragment == null) {
-                return;
-            }
-            fragment.updateImage(result);
-        }
-
     }
 }

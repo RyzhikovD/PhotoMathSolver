@@ -12,4 +12,5 @@
     <string name="failed_to_load_formulas">Failed to load formulas from database</string>
     <string name="scanned_photos">Scanned photos</string>
     <string name="select_image">Select image</string>
+    <string name="failed_to_load_formula">Failed to scan formula</string>
 </resources>

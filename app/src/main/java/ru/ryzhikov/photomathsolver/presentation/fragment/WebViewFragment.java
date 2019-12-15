@@ -1,4 +1,4 @@
-package ru.ryzhikov.photomathsolver.fragment;
+package ru.ryzhikov.photomathsolver.presentation.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;

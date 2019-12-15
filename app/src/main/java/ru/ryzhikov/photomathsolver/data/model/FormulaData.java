@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Полученный от Mathpix json
  */
-public class Formula {
+public class FormulaData {
 
     @SerializedName("latex_normal")
     @Expose
@@ -39,56 +39,56 @@ public class Formula {
     public static class DetectionMap {
         @SerializedName("contains_chart")
         @Expose
-        public double contains_chart;
+        public double mCcontainsChart;
 
         @SerializedName("contains_diagram")
         @Expose
-        public double contains_diagram;
+        public double mContainsDiagram;
 
         @SerializedName("contains_graph")
         @Expose
-        public double contains_graph;
+        public double mContainsGraph;
 
         @SerializedName("contains_table")
         @Expose
-        public double contains_table;
+        public double mContainsTable;
 
         @SerializedName("is_inverted")
         @Expose
-        public double is_inverted;
+        public double mIsInverted;
 
         @SerializedName("is_not_math")
         @Expose
-        public double is_not_math;
+        public double mIsNotMath;
 
         @SerializedName("is_printed")
         @Expose
-        public double is_printed;
+        public double mIsPrinted;
 
         @SerializedName("is_blank")
         @Expose
-        public double is_blank;
+        public double mIsBlank;
     }
 
     public static class Position {
         @SerializedName("width")
         @Expose
-        public double width;
+        public double mWidth;
 
         @SerializedName("height")
         @Expose
-        public double height;
+        public double mHeight;
 
         @SerializedName("top_left_x")
         @Expose
-        public double top_left_x;
+        public double mTopLeftX;
 
         @SerializedName("top_left_y")
         @Expose
-        public double top_left_y;
+        public double mTopLeftY;
     }
 
-    public Formula(String latex, String wolfram) {
+    public FormulaData(String latex, String wolfram) {
         mLatex = latex;
         mWolfram = wolfram;
     }
