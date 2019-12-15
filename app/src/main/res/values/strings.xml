@@ -11,4 +11,5 @@
     <string name="loading_process">Image processing. Please, wait…</string>
     <string name="failed_to_load_formulas">Failed to load formulas from database</string>
     <string name="scanned_photos">Scanned photos</string>
+    <string name="select_image">Select image</string>
 </resources>
