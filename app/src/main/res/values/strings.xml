@@ -16,4 +16,5 @@
     <string name="loading_formulas">Loading formulas...</string>
     <string name="your_scanned_photos_will_be_stored_here">Your scanned photos will be stored here</string>
     <string name="loading_image">Loading image...</string>
+    <string name="solving">Solving...</string>
 </resources>

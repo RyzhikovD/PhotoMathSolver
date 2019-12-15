@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ public class ImageListFragment extends Fragment {
     private PhotoMathSolverViewModel mViewModel;
     private RecyclerView mRecyclerView;
     private View mLoadingView;
+    private TextView mNoScannedImagesText;
     private FormulasAdapter.OnFormulaClickListener mOnFormulaClickListener = (formula) ->
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.root, EditFormulaFragment.newInstance(formula, mViewModel))
@@ -50,6 +52,7 @@ public class ImageListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.recycler_view_images);
         mLoadingView = view.findViewById(R.id.progress_view);
+        mNoScannedImagesText = view.findViewById(R.id.text_scanned_photos);
     }
 
     @Override
@@ -62,9 +65,13 @@ public class ImageListFragment extends Fragment {
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
         mViewModel.getFormulas().observe(this, formulas -> {
-            FormulasAdapter formulasAdapter = new FormulasAdapter(formulas);
-            formulasAdapter.setClickListener(mOnFormulaClickListener);
-            mRecyclerView.setAdapter(formulasAdapter);
+            if (formulas == null) {
+                mNoScannedImagesText.setVisibility(View.VISIBLE);
+            } else {
+                FormulasAdapter formulasAdapter = new FormulasAdapter(formulas);
+                formulasAdapter.setClickListener(mOnFormulaClickListener);
+                mRecyclerView.setAdapter(formulasAdapter);
+            }
         });
         mViewModel.isLoading().observe(this, isLoading ->
                 mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));

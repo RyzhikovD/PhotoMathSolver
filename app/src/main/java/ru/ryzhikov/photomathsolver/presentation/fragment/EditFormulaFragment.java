@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+
 import ru.ryzhikov.photomathsolver.R;
 import ru.ryzhikov.photomathsolver.domain.model.Formula;
 import ru.ryzhikov.photomathsolver.domain.utils.URLConverter;
@@ -23,11 +25,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     private final PhotoMathSolverViewModel mViewModel;
     private EditText mEditFormula;
     private ImageView mImageView;
-    private View mLoadingView;
-
-    {
-        setRetainInstance(true);
-    }
+    private View mLoadingImageView;
 
     static EditFormulaFragment newInstance(Formula formula, PhotoMathSolverViewModel viewModel) {
         return new EditFormulaFragment(formula, viewModel);
@@ -49,7 +47,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         super.onViewCreated(view, savedInstanceState);
         mEditFormula = view.findViewById(R.id.edit_text_formula);
         mImageView = view.findViewById(R.id.image_of_formula);
-        mLoadingView = view.findViewById(R.id.progress_view);
+        mLoadingImageView = view.findViewById(R.id.progress_image_view);
         view.findViewById(R.id.button_solve).setOnClickListener(this);
     }
 
@@ -59,7 +57,7 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
         mEditFormula.setText(mFormula.getWolfram());
         mViewModel.getImage().observe(this, bitmap -> mImageView.setImageBitmap(bitmap));
         mViewModel.isLoading().observe(this, isLoading ->
-                mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
+                mLoadingImageView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
         mViewModel.getErrors().observe(this, error ->
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show());
         mViewModel.loadImageForFormula(URLConverter.getUrlForLatexFormula(mFormula.getLatex()));
@@ -68,10 +66,12 @@ public class EditFormulaFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_solve) {
+            ((ExtendedFloatingActionButton) v).hide();
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.root, WebViewFragment.newInstance(URLConverter.getUrlForWolframFormula(mEditFormula.getText().toString())))
                     .addToBackStack(WebViewFragment.class.getSimpleName())
                     .commit();
+            ((ExtendedFloatingActionButton) v).show();
         }
     }
 }

@@ -36,7 +36,7 @@ import ru.ryzhikov.photomathsolver.domain.FileProvider;
 import ru.ryzhikov.photomathsolver.presentation.FormulaViewModelFactory;
 import ru.ryzhikov.photomathsolver.presentation.PhotoMathSolverViewModel;
 
-public class CropPhotoFragment extends Fragment implements View.OnClickListener {
+public class ChoosePhotoFragment extends Fragment implements View.OnClickListener {
 
     private static final int CAMERA_REQUEST = 0;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -62,7 +62,7 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     }
 
     public static Fragment newInstance() {
-        return new CropPhotoFragment();
+        return new ChoosePhotoFragment();
     }
 
     @Nullable
@@ -88,7 +88,13 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupMVVM();
+        if (mViewModel == null) {
+            setupMVVM();
+        } else if (mBitmap != null) {
+            mImageView.setImageBitmap(mBitmap);
+            mSelectImageButton.hide();
+            showImage();
+        }
     }
 
     @Override
@@ -121,7 +127,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
             if (mImageUri != null) {
                 Cursor cursor = requireActivity().getContentResolver().query(mImageUri,
                         filePathColumn, null, null, null);
-
                 if (cursor != null) {
                     cursor.moveToFirst();
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -129,7 +134,6 @@ public class CropPhotoFragment extends Fragment implements View.OnClickListener 
                     cursor.close();
                 }
             }
-
             mBitmap = PhotoMathSolverViewModel.getBitmap(mCurrentPhotoPath);
             mImageView.setImageBitmap(mBitmap);
             showImage();
