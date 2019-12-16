@@ -33,6 +33,7 @@ public class FormulasRepository implements IFormulasRepository {
     private static final String[] FORMATS = {"latex_normal", "wolfram"};
     private static final String IMAGE_ROOT_URL = "https://chart.googleapis.com/chart?cht=tx&chl=";
     private static final String SIZE_OF_IMAGE_URL_ARGUMENT = "&chs=200";
+    private static final String BASE64_PREFIX = "data:image/jpeg;base64,";
 
     private final IPhotoScanService mPhotoScanService;
     private final FormulasDatabase mDatabase;
@@ -99,10 +100,10 @@ public class FormulasRepository implements IFormulasRepository {
     }
 
     private FormulaData loadFormulaViaRetrofit(String src) throws IOException {
-        RequestBody requestBody = new RequestBody("data:image/jpeg;base64," + src, FORMATS);
+        RequestBody requestBody = new RequestBody(BASE64_PREFIX + src, FORMATS);
         Call<FormulaData> listCall = mPhotoScanService.scanImage(requestBody);
         retrofit2.Response<FormulaData> response = listCall.execute();
-        if (response.body() == null || response.errorBody() != null) {
+        if (response.body() == null) {
             throw new IOException("Не удалось отсканировать фото");
         }
         return response.body();

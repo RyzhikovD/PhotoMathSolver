@@ -14,9 +14,9 @@ public class FormulaData {
 
     private DetectionMap mDetectionMap;
 
-//    @SerializedName("error")
-//    @Expose
-//    private String mError;
+    @SerializedName("error")
+    @Expose
+    private String mError;
 
     @SerializedName("detection_list")
     @Expose

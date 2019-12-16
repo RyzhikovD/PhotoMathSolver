@@ -147,6 +147,8 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
                 CropImage.activity(mImageUri).start(requireActivity(), this);
                 break;
             case R.id.button_scan:
+                mCropButton.hide();
+                mScanButton.hide();
                 mViewModel.scanImage(mCurrentPhotoPath, mBitmap);
                 break;
             case R.id.button_select_image:
@@ -217,11 +219,14 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
     private void setupMVVM() {
         mViewModel = ViewModelProviders.of(this, new FormulaViewModelFactory(requireContext()))
                 .get(PhotoMathSolverViewModel.class);
-        mViewModel.getFormula().observe(this, formula ->
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root, EditFormulaFragment.newInstance(formula, mViewModel))
-                        .addToBackStack(EditFormulaFragment.class.getSimpleName())
-                        .commit());
+        mViewModel.getFormula().observe(this, formula -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.root, EditFormulaFragment.newInstance(formula, mViewModel))
+                    .addToBackStack(EditFormulaFragment.class.getSimpleName())
+                    .commit();
+            mScanButton.show();
+            mCropButton.show();
+        });
         mViewModel.isLoading().observe(this, isLoading ->
                 mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
         mViewModel.getErrors().observe(this, error ->

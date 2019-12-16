@@ -21,7 +21,7 @@ public class FormulasInteractor {
      * Загружает картинку для latex формулы
      *
      * @param latexFormula - latex формула
-     * @return
+     * @return Bitmap с формулой
      */
     @Nullable
     public Bitmap loadImage(String latexFormula) throws IOException{
