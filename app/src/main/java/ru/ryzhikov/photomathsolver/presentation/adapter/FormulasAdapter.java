@@ -51,12 +51,12 @@ public class FormulasAdapter extends RecyclerView.Adapter<FormulasAdapter.Formul
 
         private ImageView mPhoto;
 
-        public FormulaHolder(@NonNull View itemView) {
+        FormulaHolder(@NonNull View itemView) {
             super(itemView);
             mPhoto = itemView.findViewById(R.id.photo_item);
         }
 
-        public void bind(Formula formula) {
+        void bind(Formula formula) {
             mPhoto.setImageBitmap(PhotoMathSolverViewModel.getBitmap(formula.getImagePath()));
 
             itemView.setOnClickListener(v -> {

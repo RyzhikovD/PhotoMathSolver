@@ -18,5 +18,5 @@ public interface IFormulasRepository {
     List<Formula> loadFormulasFromDB();
 
     @Nullable
-    Bitmap loadImageForFormula(String latexFormula);
+    Bitmap loadImageForFormula(String latexFormula) throws IOException;
 }

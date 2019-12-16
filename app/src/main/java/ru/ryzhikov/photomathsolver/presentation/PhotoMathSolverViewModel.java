@@ -69,8 +69,12 @@ public class PhotoMathSolverViewModel extends ViewModel {
     public void loadImageForFormula(String latexFormula) {
         mIsLoading.setValue(true);
         mExecutor.execute(() -> {
-            Bitmap image = mFormulasInteractor.loadImage(latexFormula);
-            mImage.postValue(image);
+            try {
+                Bitmap image = mFormulasInteractor.loadImage(latexFormula);
+                mImage.postValue(image);
+            } catch (IOException e) {
+                mErrors.postValue(mResourceWrapper.getString(R.string.failed_to_load_image));
+            }
             mIsLoading.postValue(false);
         });
     }

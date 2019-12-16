@@ -8,11 +8,10 @@
     android:layout_marginRight="@dimen/mtrl_card_spacing">
 
     <ImageView
-        android:layout_gravity="center"
         android:id="@+id/photo_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rectangle"
+        android:layout_gravity="center"
         android:contentDescription="@string/image_of_formula" />
 
 </com.google.android.material.card.MaterialCardView>

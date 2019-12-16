@@ -24,7 +24,7 @@ public class FormulasInteractor {
      * @return
      */
     @Nullable
-    public Bitmap loadImage(String latexFormula) {
+    public Bitmap loadImage(String latexFormula) throws IOException{
         return mFormulasRepository.loadImageForFormula(latexFormula);
     }
 

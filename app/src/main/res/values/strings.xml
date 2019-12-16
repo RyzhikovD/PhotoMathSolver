@@ -13,8 +13,10 @@
     <string name="scanned_photos">Scanned photos</string>
     <string name="select_image">Select image</string>
     <string name="failed_to_load_formula">Failed to scan formula</string>
-    <string name="loading_formulas">Loading formulas...</string>
+    <string name="failed_to_take_a_photo">Failed to take a photo</string>
+    <string name="loading_formulas">Loading formulas…</string>
     <string name="your_scanned_photos_will_be_stored_here">Your scanned photos will be stored here</string>
-    <string name="loading_image">Loading image...</string>
-    <string name="solving">Solving...</string>
+    <string name="loading_image">Loading image…</string>
+    <string name="solving">Solving…</string>
+    <string name="failed_to_load_image">Failed to load image for formula</string>
 </resources>

@@ -36,6 +36,7 @@
             android:padding="@dimen/default_padding"
             android:text="@string/loading_process"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

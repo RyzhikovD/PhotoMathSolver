@@ -111,7 +111,7 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
                     showImage();
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     Exception error = result.getError();
-                    error.printStackTrace();
+                    Toast.makeText(requireContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -202,7 +202,7 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
                 try {
                     dispatchTakePictureIntent();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Toast.makeText(requireContext(), getString(R.string.failed_to_take_a_photo), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.button_scanned_photos:
@@ -266,12 +266,7 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
     private void dispatchTakePictureIntent() throws IOException {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            File photoFile = createImageFile();
             if (photoFile != null) {
                 mImageUri = FileProvider.getUriForFile(requireContext(),
                         BuildConfig.APPLICATION_ID + ".provider",
@@ -283,7 +278,7 @@ public class ChoosePhotoFragment extends Fragment implements View.OnClickListene
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = SimpleDateFormat.getDateInstance().format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM), "Camera");

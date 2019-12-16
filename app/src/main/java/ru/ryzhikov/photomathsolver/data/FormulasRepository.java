@@ -3,7 +3,6 @@ package ru.ryzhikov.photomathsolver.data;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,7 +60,8 @@ public class FormulasRepository implements IFormulasRepository {
                 .build();
         mPhotoScanService = retrofit.create(IPhotoScanService.class);
 
-        RoomDatabase.Builder<FormulasDatabase> builder = Room.databaseBuilder(context, FormulasDatabase.class, "formulas");
+        RoomDatabase.Builder<FormulasDatabase> builder =
+                Room.databaseBuilder(context, FormulasDatabase.class, "formulas");
         mDatabase = builder.build();
     }
 
@@ -69,7 +69,6 @@ public class FormulasRepository implements IFormulasRepository {
     public Formula loadFormula(final String path, String src) throws IOException {
         FormulaDB formulaDB = mDatabase.getFormulasDao().getFormulaByPath(path);
         if (formulaDB != null) {
-            Log.d("Repository", "loadFormulaViaDB() called");
             return mFormulasConverter.convert(formulaDB);
         } else {
             final FormulaData formulaData = loadFormulaViaRetrofit(src);
@@ -89,31 +88,17 @@ public class FormulasRepository implements IFormulasRepository {
     }
 
     @Nullable
-    public Bitmap loadImageForFormula(String latexFormula) {
-        Bitmap image = null;
-        InputStream is = null;
-
-        try {
-            is = new URL(IMAGE_ROOT_URL + latexFormula + SIZE_OF_IMAGE_URL_ARGUMENT).openStream();
-            image = BitmapFactory.decodeStream(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+    public Bitmap loadImageForFormula(String latexFormula) throws IOException {
+        InputStream is = new URL(IMAGE_ROOT_URL + latexFormula + SIZE_OF_IMAGE_URL_ARGUMENT)
+                .openStream();
+        Bitmap image = BitmapFactory.decodeStream(is);
+        if (is != null) {
+            is.close();
         }
         return image;
     }
 
     private FormulaData loadFormulaViaRetrofit(String src) throws IOException {
-
-        Log.d("Repository", "loadFormulaViaRetrofit() called");
-
         RequestBody requestBody = new RequestBody("data:image/jpeg;base64," + src, FORMATS);
         Call<FormulaData> listCall = mPhotoScanService.scanImage(requestBody);
         retrofit2.Response<FormulaData> response = listCall.execute();

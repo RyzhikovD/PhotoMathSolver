@@ -27,6 +27,7 @@
             android:padding="@dimen/default_padding"
             android:text="@string/loading_image"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
     </RelativeLayout>
 
     <LinearLayout

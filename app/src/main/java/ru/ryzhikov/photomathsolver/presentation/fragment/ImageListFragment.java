@@ -65,7 +65,9 @@ public class ImageListFragment extends Fragment {
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
         mViewModel.getFormulas().observe(this, formulas -> {
-            if (formulas == null) {
+            System.out.println("FLEX");
+            if (formulas.isEmpty()) {
+                System.out.println(formulas.size());
                 mNoScannedImagesText.setVisibility(View.VISIBLE);
             } else {
                 FormulasAdapter formulasAdapter = new FormulasAdapter(formulas);
