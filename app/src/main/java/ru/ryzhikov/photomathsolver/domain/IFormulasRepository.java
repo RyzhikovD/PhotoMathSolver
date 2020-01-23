@@ -19,4 +19,6 @@ public interface IFormulasRepository {
 
     @Nullable
     Bitmap loadImageForFormula(String latexFormula) throws IOException;
+
+    void deleteAllFormulas();
 }

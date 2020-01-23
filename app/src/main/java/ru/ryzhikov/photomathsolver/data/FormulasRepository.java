@@ -99,6 +99,10 @@ public class FormulasRepository implements IFormulasRepository {
         return image;
     }
 
+    public void deleteAllFormulas() {
+        mDatabase.getFormulasDao().removeAll();
+    }
+
     private FormulaData loadFormulaViaRetrofit(String src) throws IOException {
         RequestBody requestBody = new RequestBody(BASE64_PREFIX + src, FORMATS);
         Call<FormulaData> listCall = mPhotoScanService.scanImage(requestBody);

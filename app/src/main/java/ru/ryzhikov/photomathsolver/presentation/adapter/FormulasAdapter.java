@@ -47,6 +47,10 @@ public class FormulasAdapter extends RecyclerView.Adapter<FormulasAdapter.Formul
         mClickListener = clickListener;
     }
 
+    public void deleteAllFormulas() {
+        mFormulas.clear();
+    }
+
     class FormulaHolder extends RecyclerView.ViewHolder {
 
         private ImageView mPhoto;

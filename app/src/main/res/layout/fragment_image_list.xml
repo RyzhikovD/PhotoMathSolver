@@ -17,6 +17,16 @@
         android:text="@string/your_scanned_photos_will_be_stored_here"
         android:visibility="gone" />
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_delete_all"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:text="@string/delete_all"
+        android:textAlignment="center" />
+
     <RelativeLayout
         android:id="@+id/progress_view"
         android:layout_width="match_parent"

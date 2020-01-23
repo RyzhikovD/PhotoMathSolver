@@ -35,4 +35,8 @@ public class FormulasInteractor {
     public List<Formula> loadFormulasFromDB() {
         return mFormulasRepository.loadFormulasFromDB();
     }
+
+    public void deleteAllFormulas() {
+        mFormulasRepository.deleteAllFormulas();
+    }
 }

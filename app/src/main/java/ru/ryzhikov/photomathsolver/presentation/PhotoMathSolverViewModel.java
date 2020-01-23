@@ -49,7 +49,11 @@ public class PhotoMathSolverViewModel extends ViewModel {
         mExecutor.execute(() -> {
             try {
                 Formula formula = mFormulasInteractor.loadFormula(path, bitmapToBase64(bitmap));
-                mFormula.postValue(formula);
+                if (formula.getLatex() == null) {
+                    throw new IOException();
+                } else {
+                    mFormula.postValue(formula);
+                }
             } catch (IOException e) {
                 mErrors.postValue(mResourceWrapper.getString(R.string.failed_to_load_formula));
             }
@@ -79,10 +83,13 @@ public class PhotoMathSolverViewModel extends ViewModel {
         });
     }
 
-    private String bitmapToBase64(Bitmap image) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, os);
-        return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
+    public void deleteAllScanedPhotos() {
+        mIsLoading.setValue(true);
+        mExecutor.execute(() -> {
+            mFormulasInteractor.deleteAllFormulas();
+            mFormulas.postValue(null);
+            mIsLoading.postValue(false);
+        });
     }
 
     public static Bitmap getBitmap(String imagePath) {
@@ -91,6 +98,12 @@ public class PhotoMathSolverViewModel extends ViewModel {
         bmOptions.inSampleSize = DEFAULT_IMAGE_COMPRESSION;
         bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
         return BitmapFactory.decodeFile(imagePath, bmOptions);
+    }
+
+    private String bitmapToBase64(Bitmap image) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, os);
+        return Base64.encodeToString(os.toByteArray(), Base64.DEFAULT);
     }
 
     @NonNull
